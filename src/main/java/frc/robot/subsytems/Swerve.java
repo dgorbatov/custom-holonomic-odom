@@ -1,6 +1,7 @@
 package frc.robot.subsytems;
 
 import SushiFrcLib.Sensors.gyro.Pigeon;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.kPorts;
 import frc.robot.Constants.kSwerve;
@@ -36,7 +37,10 @@ public class Swerve extends SubsystemBase {
 
     // Vector is in mps, and rot is in radians per sec
     public void drive(Vector vector, double rot) {
+        SmartDashboard.putString("Input: ", vector.x + ", " + vector.y + ", " + rot);
         vector.rotate(gyro.getAngle());
+
+        SmartDashboard.putString("Input Post Rotate : ", vector.x + ", " + vector.y + ", " + rot);
 
         SwerveModuleState[] states = kSwerve.SWERVE_KINEMATICS.getStates(vector, rot);
 
@@ -47,10 +51,13 @@ public class Swerve extends SubsystemBase {
         }
 
         for (SwerveModule i : swerveMods) {
+            SmartDashboard.putString("Swerve Module State " + i.moduleNumber, states[i.moduleNumber].velocity + ", " + states[i.moduleNumber].angle.getDegrees());
             i.setDesiredState(states[i.moduleNumber]);
         }
     }
 
     @Override
-    public void periodic() { }
+    public void periodic() { 
+        SmartDashboard.putNumber("Angle", gyro.getAngle().getDegrees());
+    }
 }
