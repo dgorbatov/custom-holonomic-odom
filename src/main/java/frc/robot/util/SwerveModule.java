@@ -64,23 +64,65 @@ public class SwerveModule {
      * Set the state of the swerve module.
      */
     public void setDesiredState(SwerveModuleState desiredState) {
-        // TODO: add optimizations
+        // TODO: test optimization code
+        double targetAngle = placeInAppropriate0To360Scope(
+            lastAngle, desiredState.angle.getDegrees()
+        );
+        double targetSpeed = desiredState.velocity;
+        double delta = targetAngle - lastAngle;
+
+        if (Math.abs(delta) > 90) {
+            targetSpeed = -targetSpeed;
+            targetAngle = delta > 90 ? (targetAngle -= 180) : (targetAngle += 180);        
+        }
 
         driveMotor.set(ControlMode.Velocity, Conversion.MPSToFalcon(
-            desiredState.velocity, 
+            targetSpeed, 
             kSwerve.WHEEL_CIRCUMFERENCE,
             kSwerve.DRIVE_GEAR_RATIO
         ));
        
-        // TODO: add anti jitter code that doesnt turn if drive is less then 1 percent of max speed
+        // TODO: Test anti jitter code
+        // anit jitter code
+        if (targetSpeed < kSwerve.MAX_SPEED * 0.02) {
+            targetAngle = lastAngle;
+        }
 
         angleMotor.set(
             ControlMode.Position, 
             Conversion.degreesToFalcon(
-                desiredState.angle.getDegrees(), 
+                targetAngle, 
                 kSwerve.ANGLE_GEAR_RATIO
             )
         );
+
+        lastAngle = targetAngle;
+    }
+
+    // Stolen from CTREModuleState.java in SushiFrcLib
+    private static double placeInAppropriate0To360Scope(double scopeReference, double newAngle) {
+        double lowerBound;
+        double upperBound;
+        double lowerOffset = scopeReference % 360;
+        if (lowerOffset >= 0) {
+            lowerBound = scopeReference - lowerOffset;
+            upperBound = scopeReference + (360 - lowerOffset);
+        } else {
+            upperBound = scopeReference - lowerOffset;
+            lowerBound = scopeReference - (360 + lowerOffset);
+        }
+        while (newAngle < lowerBound) {
+            newAngle += 360;
+        }
+        while (newAngle > upperBound) {
+            newAngle -= 360;
+        }
+        if (newAngle - scopeReference > 180) {
+            newAngle -= 360;
+        } else if (newAngle - scopeReference < -180) {
+            newAngle += 360;
+        }
+        return newAngle;
     }
 
     public void resetToAbsolute() {
