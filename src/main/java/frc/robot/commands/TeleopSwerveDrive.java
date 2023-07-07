@@ -48,7 +48,7 @@ public class TeleopSwerveDrive extends CommandBase {
     public void execute() {
         isRedAlliance = table.getEntry("IsRedAlliance").getBoolean(true);
         double forwardBack = yaxisSupplier.get() * (isRedAlliance ? -1 : 1);
-        double leftRight = xaxisSupplier.get() * (isRedAlliance ? -1 : 1);
+        double leftRight = -xaxisSupplier.get() * (isRedAlliance ? -1 : 1);
         double rot = rotSupplier.get();
 
         forwardBack = Normalization.cube(applyDeadband(forwardBack));

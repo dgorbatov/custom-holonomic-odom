@@ -12,7 +12,7 @@ public class Vector {
     }
 
     public double getAngle() {
-        return Math.atan(y / x);
+        return (Math.atan(y/x) + ((Math.atan(y/x)+ (x>0?0:Math.PI))<0?(Math.PI*2):0) + (x>0?0:Math.PI));
     }
 
     public double getScalar() {
@@ -20,7 +20,7 @@ public class Vector {
     }
 
     public Vector rotate(Rotation2d angle) {
-        double newAngle = Rotation2d.fromRadians(getAngle() + angle.getRadians()).getRadians();
+        double newAngle = Rotation2d.fromRadians(getAngle() - angle.getRadians()).getRadians();
         double scalar = getScalar(); 
 
         this.x = Math.cos(newAngle) * scalar;

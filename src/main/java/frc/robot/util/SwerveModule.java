@@ -2,7 +2,6 @@ package frc.robot.util;
 
 import SushiFrcLib.Math.Conversion;
 import SushiFrcLib.Motor.MotorHelper;
-import SushiFrcLib.Swerve.CTREModuleState;
 import SushiFrcLib.Swerve.SwerveModuleConstants;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;

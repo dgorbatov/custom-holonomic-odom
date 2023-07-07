@@ -19,10 +19,11 @@ public class SwerveKinematics {
         };
     }
 
+    // Math taken from https://file.tavsys.net/control/controls-engineering-in-frc.pdf page 211
     private SwerveModuleState getModuleState(Vector translation, double rot, Vector r) {
-        double x = translation.x - (rot * r.y);
-        double y = translation.y + (rot * r.x);
+        double x = translation.x - (rot * r.x); // Module velocity sub x = robot velocity sub x - (angular velo) * (translation vectory y)
+        double y = translation.y + (rot * r.y); // Module velocity sub y = robot velocity sub y + (angular velo) * (translation vectory x)
 
-        return new SwerveModuleState(Math.sqrt(x * x + y * y), Rotation2d.fromRadians(Math.atan(y/x)));
+        return new SwerveModuleState(Math.sqrt(x * x + y * y), Rotation2d.fromRadians(Math.atan(y/x) + ((Math.atan(y/x)+ (x>0?0:Math.PI))<0?(Math.PI*2):0) + (x>0?0:Math.PI)));
     }
 }

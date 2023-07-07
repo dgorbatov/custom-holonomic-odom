@@ -55,8 +55,8 @@ public final class Constants {
 
         public static final SwerveKinematics SWERVE_KINEMATICS = new SwerveKinematics(
                 new Vector(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
-                new Vector(WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0),
                 new Vector(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
+                new Vector(WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0),
                 new Vector(-WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0));
 
         /* Swerve Current Limiting */
