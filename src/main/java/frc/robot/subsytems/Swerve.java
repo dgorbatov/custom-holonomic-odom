@@ -41,7 +41,6 @@ public class Swerve extends SubsystemBase {
         SmartDashboard.putString("Input: ", vector.x + ", " + vector.y + ", " + rot);
 
         // field oriented
-
         if (vector.getScalar() > kSwerve.MAX_SPEED * 0.02) {
             vector.rotate(gyro.getAngle());
         }
@@ -50,6 +49,7 @@ public class Swerve extends SubsystemBase {
 
         SwerveModuleState[] states = kSwerve.SWERVE_KINEMATICS.getStates(vector, rot);
 
+        // TODO: FIX SHITY CODE https://github.com/frc1678/C2023-Public/blob/main/src/main/java/com/team1678/lib/swerve/SwerveDriveKinematics.java
         for (SwerveModuleState i : states) {
             if (i.velocity > kSwerve.MAX_SPEED) {
                 i.velocity = kSwerve.MAX_SPEED;
