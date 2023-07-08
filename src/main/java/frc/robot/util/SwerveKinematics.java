@@ -1,13 +1,26 @@
 package frc.robot.util;
 
+import org.ejml.simple.SimpleMatrix;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class SwerveKinematics {
     private Vector[] modVectors;
+    private SimpleMatrix forwardKinematics;
+
 
     // Modules are expected to move in a clockwise order, ex: mod0 -> mod1 -> mod2 -> mod3
     public SwerveKinematics(Vector mod0, Vector mod1, Vector mod2, Vector mod3) {
         modVectors = new Vector[]{mod0, mod1, mod2, mod3};
+
+        forwardKinematics = new SimpleMatrix(8, 3);
+
+        for (int i = 0; i < 4; ++i) {
+            forwardKinematics.setRow(i * 2 + 0, 0, /* Start Data */ 1, 0, -modVectors[i].y);
+            forwardKinematics.setRow(i * 2 + 1, 0, /* Start Data */ 0, 1, +modVectors[i].x);
+        }
+
+        forwardKinematics = forwardKinematics.pseudoInverse();
     }
     
     public SwerveModuleState[] getStates(Vector translation, double rot) {
@@ -17,6 +30,25 @@ public class SwerveKinematics {
             getModuleState(translation, rot, modVectors[2]),
             getModuleState(translation, rot, modVectors[3]),
         };
+    }
+
+    public ChassisSpeed getSpeedFromStates(SwerveModuleState[] modStates) {
+        SimpleMatrix modStatesMatrix = new SimpleMatrix(8, 1);
+
+        for (int i = 0; i < 4; ++i) {
+            modStatesMatrix.set(i * 2, 0, modStates[i].velocity * modStates[i].angle.getCos());
+            modStatesMatrix.set(i * 2 + 1, modStates[i].velocity * modStates[i].angle.getSin());
+        }
+      
+        SimpleMatrix chassisSpeedMatrix = forwardKinematics.mult(modStatesMatrix);
+
+        return new ChassisSpeed(
+            new Vector(
+                chassisSpeedMatrix.get(0,0), 
+                chassisSpeedMatrix.get(1,0)
+            ), 
+            chassisSpeedMatrix.get(2,0)
+        );
     }
 
     // Math taken from https://file.tavsys.net/control/controls-engineering-in-frc.pdf page 211
