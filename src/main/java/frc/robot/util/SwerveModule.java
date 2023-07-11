@@ -139,6 +139,19 @@ public class SwerveModule {
         );
     }
 
+    public SwerveModulePosition getPose() {
+        double distance = Conversion.falconToM(
+            driveMotor.getSelectedSensorPosition(), kSwerve.WHEEL_CIRCUMFERENCE,
+            kSwerve.DRIVE_GEAR_RATIO
+        );
+        Rotation2d angle = Rotation2d.fromDegrees(
+            Conversion.falconToDegrees(
+                angleMotor.getSelectedSensorPosition(), kSwerve.ANGLE_GEAR_RATIO
+            )
+        );
+        return new SwerveModulePosition(distance, angle);
+    }
+
     public Rotation2d getCanCoder() {
         return Rotation2d.fromDegrees(angleEncoder.getAbsolutePosition());
     }

@@ -32,12 +32,12 @@ public class SwerveKinematics {
         };
     }
 
-    public ChassisSpeed getSpeedFromStates(SwerveModuleState[] modStates) {
+    public ChassisSpeed getSpeedFromDelta(SwerveModulePosition[] modDelta) {
         SimpleMatrix modStatesMatrix = new SimpleMatrix(8, 1);
 
         for (int i = 0; i < 4; ++i) {
-            modStatesMatrix.set(i * 2, 0, modStates[i].velocity * modStates[i].angle.getCos());
-            modStatesMatrix.set(i * 2 + 1, modStates[i].velocity * modStates[i].angle.getSin());
+            modStatesMatrix.set(i * 2, 0, modDelta[i].distance * modDelta[i].angle.getCos());
+            modStatesMatrix.set(i * 2 + 1, modDelta[i].distance * modDelta[i].angle.getSin());
         }
       
         SimpleMatrix chassisSpeedMatrix = forwardKinematics.mult(modStatesMatrix);

@@ -1,18 +1,24 @@
 package frc.robot.subsytems;
 
 import SushiFrcLib.Sensors.gyro.Pigeon;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.kPorts;
 import frc.robot.Constants.kSwerve;
 import frc.robot.util.SwerveModule;
+import frc.robot.util.SwerveModulePosition;
 import frc.robot.util.SwerveModuleState;
+import frc.robot.util.SwerveOdom;
 import frc.robot.util.Vector;
 
 public class Swerve extends SubsystemBase {
     private final SwerveModule[] swerveMods;
     private final Pigeon gyro;
+    private final SwerveOdom odom;
+    private final Field2d field;
 
     private static Swerve instance;
 
@@ -34,6 +40,12 @@ public class Swerve extends SubsystemBase {
             new SwerveModule(2, kSwerve.Mod2.CONSTANTS),
             new SwerveModule(3, kSwerve.Mod3.CONSTANTS),
         };
+
+        odom = new SwerveOdom(kSwerve.SWERVE_KINEMATICS);
+
+        field = new Field2d();
+        SmartDashboard.putData("Field", field);
+
     }
 
     // Vector is in mps, and rot is in radians per sec
@@ -68,9 +80,23 @@ public class Swerve extends SubsystemBase {
         }
     }
 
+    public SwerveModulePosition[] getPose() {
+        SwerveModulePosition[] ret = new SwerveModulePosition[]{null, null, null, null};
+
+        for (SwerveModule i : swerveMods) {
+            ret[i.moduleNumber] = i.getPose();
+        } 
+
+        return ret;
+    }
+
     @Override
     public void periodic() { 
+        odom.updatePoseWithGyro(getPose(),  gyro.getAngle());
+
         SmartDashboard.putNumber("Angle", gyro.getAngle().getDegrees());
+
+        field.setRobotPose(odom.getPose().getPose2d());
 
         for (SwerveModule i : swerveMods) {
             SmartDashboard.putNumber("Swerve Module Angle " + i.moduleNumber, i.getAngle());
