@@ -1,10 +1,7 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
-import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
-import com.ctre.phoenix.sensors.SensorInitializationStrategy;
+import com.revrobotics.CANSparkMax.IdleMode;
 
 import SushiFrcLib.Swerve.SwerveModuleConstants;
 import edu.wpi.first.math.util.Units;
@@ -13,6 +10,12 @@ import frc.robot.util.SwerveKinematics;
 import frc.robot.util.Vector;
 
 public final class Constants {
+    public static enum RobotName {
+        NEO_SWERVE,FALCON_SWERVE;
+    }
+
+    public static final RobotName NAME = RobotName.FALCON_SWERVE;
+
     public static class kPorts {
         public static final String CANIVORE_NAME = "Sussy Squad";
         public static final int PIGEON_ID = 13;
@@ -37,21 +40,22 @@ public final class Constants {
 
         public static final boolean GYRO_INVERSION = false; // Always ensure Gyro is CCW+ CW-
 
-        // Rotation Lock PID Values
-        public static final double rotationP = 0.1;
-        public static final double rotationI = 0.0;
-        public static final double rotationD = 0.0;
-
         /* Drivetrain Constants */
-        public static final double TRACK_WIDTH = Units.inchesToMeters(21.73);
-        public static final double WHEEL_BASE = Units.inchesToMeters(21.73);
+        public static final double TRACK_WIDTH = Units.inchesToMeters(NAME == RobotName.NEO_SWERVE ? 19.5 : 21.73); // Falcon swerve: 21.73
+        public static final double WHEEL_BASE = Units.inchesToMeters(NAME == RobotName.NEO_SWERVE ? 19.5 : 21.73);
         public static final double WHEEL_DIAMATER = Units.inchesToMeters(4);
         public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMATER * Math.PI;
 
         public static final double OPEN_LOOP_RAMP = 0.25;
 
-        public static final double DRIVE_GEAR_RATIO = 6.75; // 6.86:1
+        public static final double DRIVE_GEAR_RATIO = 6.75 / 1.0; // 6.86:1
         public static final double ANGLE_GEAR_RATIO = (150.0 / 7.0); // 12.8:1
+
+        // Neo Swerve Constants
+        public static final double DRIVE_ROTATIONS_TO_METERS = WHEEL_CIRCUMFERENCE / DRIVE_GEAR_RATIO;
+        public static final double DRIVE_RPM_TO_METERS_PER_SECOND = DRIVE_ROTATIONS_TO_METERS / 60.0;
+        public static final double ANGLE_ROTATIONS_TO_RADIANS = (2 * Math.PI) / ANGLE_GEAR_RATIO;
+        public static final double ANGLE_RPM_TO_RADIANS_PER_SECOND = DRIVE_ROTATIONS_TO_METERS / 60.0;
 
         public static final SwerveKinematics SWERVE_KINEMATICS = new SwerveKinematics(
                 new Vector(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
@@ -84,6 +88,9 @@ public final class Constants {
         /* Neutral Modes */
         public static final NeutralMode ANGLE_NEUTRAL_MODE = NeutralMode.Coast;
         public static final NeutralMode DRIVE_NEUTRAL_MODE = NeutralMode.Brake;
+
+        public static final IdleMode ANGLE_IDLE_MODE = IdleMode.kCoast;
+        public static final IdleMode DRIVE_IDEL_MODE = IdleMode.kBrake;
 
         /* Motor Inverts */
         public static final boolean DRIVE_INVERSION = false;
@@ -137,6 +144,36 @@ public final class Constants {
 
             public static final SwerveModuleConstants CONSTANTS = new SwerveModuleConstants(
                 DRIVE_MOTOR_ID, ANGLE_MOTOR_ID, CAN_CODER_ID, ANGLE_OFFSET
+            );
+        }
+
+        public static final class kNeoSwerve {
+            public static final SwerveModuleConstants MOD_0_Constants = new SwerveModuleConstants(
+            1,
+            2,
+            3,
+            330.8203
+            );
+
+            public static final SwerveModuleConstants MOD_1_Constants = new SwerveModuleConstants(
+            4,
+            5,
+            6,
+            353.32  
+            );
+
+            public static final SwerveModuleConstants MOD_2_Constants = new SwerveModuleConstants(
+            7,
+            8,
+            9,
+            338.115
+            );
+
+            public static final SwerveModuleConstants MOD_3_Constants = new SwerveModuleConstants(
+            10,
+            11,
+            12,
+            27.949
             );
         }
     }

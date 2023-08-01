@@ -36,7 +36,7 @@ public class Robot extends TimedRobot {
         DataLogManager.start();
         DriverStation.startDataLog(DataLogManager.getLog());
 
-        (new Compressor(1, PneumaticsModuleType.REVPH)).disable();
+        (new Compressor(PneumaticsModuleType.REVPH)).enableAnalog(119, 120);
     }
 
     /**

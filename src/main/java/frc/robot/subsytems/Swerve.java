@@ -1,6 +1,9 @@
 package frc.robot.subsytems;
 
+import SushiFrcLib.Sensors.gyro.Gyro;
+import SushiFrcLib.Sensors.gyro.Navx;
 import SushiFrcLib.Sensors.gyro.Pigeon;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -8,15 +11,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.kPorts;
 import frc.robot.Constants.kSwerve;
-import frc.robot.util.SwerveModule;
 import frc.robot.util.SwerveModulePosition;
 import frc.robot.util.SwerveModuleState;
 import frc.robot.util.SwerveOdom;
 import frc.robot.util.Vector;
+import frc.robot.util.SwerveModule.SwerveModule;
+import frc.robot.util.SwerveModule.SwerveModuleFalcon;
+import frc.robot.util.SwerveModule.SwerveModuleNeo;
 
 public class Swerve extends SubsystemBase {
     private final SwerveModule[] swerveMods;
-    private final Pigeon gyro;
+    private final Gyro gyro;
     private final SwerveOdom odom;
     private final Field2d field;
 
@@ -32,13 +37,21 @@ public class Swerve extends SubsystemBase {
 
     private Swerve() {
         gyro = new Pigeon(kPorts.PIGEON_ID, kSwerve.GYRO_INVERSION, kPorts.CANIVORE_NAME);
+        // gyro = new Navx();
         gyro.zeroGyro();
 
-        swerveMods = new SwerveModule[]{
-            new SwerveModule(0, kSwerve.Mod0.CONSTANTS),
-            new SwerveModule(1, kSwerve.Mod1.CONSTANTS),
-            new SwerveModule(2, kSwerve.Mod2.CONSTANTS),
-            new SwerveModule(3, kSwerve.Mod3.CONSTANTS),
+        // swerveMods = new SwerveModuleNeo[]{
+        //     new SwerveModuleNeo(0, kSwerve.kNeoSwerve.MOD_0_Constants),
+        //     new SwerveModuleNeo(1, kSwerve.kNeoSwerve.MOD_1_Constants),
+        //     new SwerveModuleNeo(2, kSwerve.kNeoSwerve.MOD_2_Constants),
+        //     new SwerveModuleNeo(3, kSwerve.kNeoSwerve.MOD_3_Constants),
+        // };
+
+        swerveMods = new SwerveModuleFalcon[]{
+            new SwerveModuleFalcon(0, kSwerve.Mod0.CONSTANTS),
+            new SwerveModuleFalcon(1, kSwerve.Mod1.CONSTANTS),
+            new SwerveModuleFalcon(2, kSwerve.Mod2.CONSTANTS),
+            new SwerveModuleFalcon(3, kSwerve.Mod3.CONSTANTS),
         };
 
         odom = new SwerveOdom(kSwerve.SWERVE_KINEMATICS);
@@ -52,11 +65,9 @@ public class Swerve extends SubsystemBase {
     public void drive(Vector vector, double rot) {
         SmartDashboard.putString("Input: ", vector.x + ", " + vector.y + ", " + rot);
 
-        // field oriented
-        if (vector.getScalar() > kSwerve.MAX_SPEED * 0.02) {
-            vector.rotate(gyro.getAngle());
-        }
 
+        vector.rotate(gyro.getAngle());
+ 
         SmartDashboard.putString("Input Post Rotate : ", vector.x + ", " + vector.y + ", " + rot);
 
         SwerveModuleState[] states = kSwerve.SWERVE_KINEMATICS.getStates(vector, rot);
@@ -94,7 +105,7 @@ public class Swerve extends SubsystemBase {
     public void periodic() { 
         odom.updatePoseWithGyro(getPose(),  gyro.getAngle());
 
-        SmartDashboard.putNumber("Angle", gyro.getAngle().getDegrees());
+        SmartDashboard.putNumber("Angle", MathUtil.inputModulus(gyro.getAngle().getDegrees(), 0, 360));
 
         field.setRobotPose(odom.getPose().getPose2d());
 

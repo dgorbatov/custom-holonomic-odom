@@ -3,6 +3,7 @@ package frc.robot.util;
 import org.ejml.simple.SimpleMatrix;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
 
 public class SwerveKinematics {
     private Vector[] modVectors;
@@ -32,21 +33,19 @@ public class SwerveKinematics {
         };
     }
 
-    public ChassisSpeed getSpeedFromDelta(SwerveModulePosition[] modDelta) {
+    public Twist2d getTwistFromDeltra(SwerveModulePosition[] modDelta) {
         SimpleMatrix modStatesMatrix = new SimpleMatrix(8, 1);
 
         for (int i = 0; i < 4; ++i) {
             modStatesMatrix.set(i * 2, 0, modDelta[i].distance * modDelta[i].angle.getCos());
-            modStatesMatrix.set(i * 2 + 1, modDelta[i].distance * modDelta[i].angle.getSin());
+            modStatesMatrix.set(i * 2 + 1,0, modDelta[i].distance * modDelta[i].angle.getSin());
         }
       
         SimpleMatrix chassisSpeedMatrix = forwardKinematics.mult(modStatesMatrix);
 
-        return new ChassisSpeed(
-            new Vector(
-                chassisSpeedMatrix.get(0,0), 
-                chassisSpeedMatrix.get(1,0)
-            ), 
+        return new Twist2d(
+            chassisSpeedMatrix.get(0,0), 
+            chassisSpeedMatrix.get(1,0),
             chassisSpeedMatrix.get(2,0)
         );
     }
@@ -56,6 +55,12 @@ public class SwerveKinematics {
         double x = translation.x - (rot * r.x); // Module velocity sub x = robot velocity sub x - (angular velo) * (translation vectory y)
         double y = translation.y + (rot * r.y); // Module velocity sub y = robot velocity sub y + (angular velo) * (translation vectory x)
 
-        return new SwerveModuleState(Math.sqrt(x * x + y * y), Rotation2d.fromRadians(Math.atan(y/x) + ((Math.atan(y/x)+ (x>0?0:Math.PI))<0?(Math.PI*2):0) + (x>0?0:Math.PI)));
+
+        return new SwerveModuleState(
+            Math.sqrt(x * x + y * y), 
+            Rotation2d.fromRadians(
+                Math.atan2(y, x)
+            )
+        );
     }
 }

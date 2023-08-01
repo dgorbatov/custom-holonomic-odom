@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.SwerveModule;
 
 import SushiFrcLib.Math.Conversion;
 import SushiFrcLib.Motor.MotorHelper;
@@ -10,16 +10,17 @@ import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.Constants.kPorts;
 import frc.robot.Constants.kSwerve;
+import frc.robot.util.SwerveModulePosition;
+import frc.robot.util.SwerveModuleState;
 
 /**
  * Falcon Swerve Module.
  */
-public class SwerveModule {
-    public int moduleNumber;
-    private double angleOffset;
+public class SwerveModuleFalcon extends SwerveModule {
     private TalonFX angleMotor;
     private TalonFX driveMotor;
     private CANCoder angleEncoder;
@@ -28,8 +29,9 @@ public class SwerveModule {
     /**
      * Instantiate a swerve module with a number from 1-4.
      */
-    public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants) {
-        this.moduleNumber = moduleNumber;
+    public SwerveModuleFalcon(int moduleNumber, SwerveModuleConstants moduleConstants) {
+        super(moduleNumber, moduleConstants);
+
         angleOffset = moduleConstants.angleOffset;
 
         /* Angle Encoder Config */
@@ -68,7 +70,9 @@ public class SwerveModule {
         double targetAngle = placeInAppropriate0To360Scope(
             lastAngle, desiredState.angle.getDegrees()
         );
+
         double targetSpeed = desiredState.velocity;
+
         double delta = targetAngle - lastAngle;
 
         if (Math.abs(delta) > 90) {
@@ -84,9 +88,9 @@ public class SwerveModule {
        
         // TODO: Test anti jitter code
         // anit jitter code
-        if (targetSpeed < kSwerve.MAX_SPEED * 0.02) {
-            targetAngle = lastAngle;
-        }
+        // if (targetSpeed < kSwerve.MAX_SPEED * 0.02) {
+        //     targetAngle = lastAngle;
+        // }
 
         angleMotor.set(
             ControlMode.Position, 
@@ -125,6 +129,7 @@ public class SwerveModule {
         return newAngle;
     }
 
+    @Override
     public void resetToAbsolute() {
         double absolutePosition = Conversion.degreesToFalcon(getAngle(), kSwerve.ANGLE_GEAR_RATIO);
         angleMotor.setSelectedSensorPosition(absolutePosition);

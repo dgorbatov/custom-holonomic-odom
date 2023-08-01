@@ -1,5 +1,6 @@
 package frc.robot.util;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 
 public class Vector {
@@ -12,7 +13,7 @@ public class Vector {
     }
 
     public double getAngle() {
-        return (Math.atan(y/x) + ((Math.atan(y/x)+ (x>0?0:Math.PI))<0?(Math.PI*2):0) + (x>0?0:Math.PI));
+        return Math.atan2(y, x);
     }
 
     public double getScalar() {
@@ -20,7 +21,7 @@ public class Vector {
     }
 
     public Vector rotate(Rotation2d angle) {
-        double newAngle = Rotation2d.fromRadians(getAngle() - angle.getRadians()).getRadians();
+        double newAngle = Rotation2d.fromRadians(getAngle() -  MathUtil.inputModulus(angle.getRadians(), -Math.PI, Math.PI)).getRadians();
         double scalar = getScalar(); 
 
         this.x = Math.cos(newAngle) * scalar;
