@@ -1,14 +1,17 @@
 package frc.robot.subsytems;
 
+import SushiFrcLib.DependencyInjection.RobotName;
 import SushiFrcLib.Sensors.gyro.Gyro;
 import SushiFrcLib.Sensors.gyro.Navx;
 import SushiFrcLib.Sensors.gyro.Pigeon;
+import edu.wpi.first.hal.simulation.ConstBufferCallback;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.kPorts;
 import frc.robot.Constants.kSwerve;
 import frc.robot.util.SwerveModulePosition;
@@ -40,19 +43,24 @@ public class Swerve extends SubsystemBase {
         // gyro = new Navx();
         gyro.zeroGyro();
 
-        // swerveMods = new SwerveModuleNeo[]{
-        //     new SwerveModuleNeo(0, kSwerve.kNeoSwerve.MOD_0_Constants),
-        //     new SwerveModuleNeo(1, kSwerve.kNeoSwerve.MOD_1_Constants),
-        //     new SwerveModuleNeo(2, kSwerve.kNeoSwerve.MOD_2_Constants),
-        //     new SwerveModuleNeo(3, kSwerve.kNeoSwerve.MOD_3_Constants),
-        // };
-
-        swerveMods = new SwerveModuleFalcon[]{
-            new SwerveModuleFalcon(0, kSwerve.Mod0.CONSTANTS),
-            new SwerveModuleFalcon(1, kSwerve.Mod1.CONSTANTS),
-            new SwerveModuleFalcon(2, kSwerve.Mod2.CONSTANTS),
-            new SwerveModuleFalcon(3, kSwerve.Mod3.CONSTANTS),
-        };
+        switch (Constants.NAME) {
+            case NEO_SWERVE:
+                swerveMods = new SwerveModuleNeo[]{
+                    new SwerveModuleNeo(0, kSwerve.kNeoSwerve.MOD_0_Constants),
+                    new SwerveModuleNeo(1, kSwerve.kNeoSwerve.MOD_1_Constants),
+                    new SwerveModuleNeo(2, kSwerve.kNeoSwerve.MOD_2_Constants),
+                    new SwerveModuleNeo(3, kSwerve.kNeoSwerve.MOD_3_Constants),
+                };    
+                break;
+            default:
+                swerveMods = new SwerveModuleFalcon[]{
+                    new SwerveModuleFalcon(0, kSwerve.Mod0.CONSTANTS),
+                    new SwerveModuleFalcon(1, kSwerve.Mod1.CONSTANTS),
+                    new SwerveModuleFalcon(2, kSwerve.Mod2.CONSTANTS),
+                    new SwerveModuleFalcon(3, kSwerve.Mod3.CONSTANTS),
+                }; 
+                break;
+        }
 
         odom = new SwerveOdom(kSwerve.SWERVE_KINEMATICS);
 
