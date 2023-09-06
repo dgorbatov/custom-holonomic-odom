@@ -1,23 +1,17 @@
 package frc.robot.subsytems;
-
-import SushiFrcLib.DependencyInjection.RobotName;
 import SushiFrcLib.Sensors.gyro.Gyro;
-import SushiFrcLib.Sensors.gyro.Navx;
 import SushiFrcLib.Sensors.gyro.Pigeon;
-import edu.wpi.first.hal.simulation.ConstBufferCallback;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.kPorts;
 import frc.robot.Constants.kSwerve;
-import frc.robot.util.SwerveModulePosition;
-import frc.robot.util.SwerveModuleState;
 import frc.robot.util.SwerveOdom;
-import frc.robot.util.Vector;
 import frc.robot.util.SwerveModule.SwerveModule;
 import frc.robot.util.SwerveModule.SwerveModuleFalcon;
 import frc.robot.util.SwerveModule.SwerveModuleNeo;
@@ -69,26 +63,25 @@ public class Swerve extends SubsystemBase {
 
     }
 
-    // Vector is in mps, and rot is in radians per sec
-    public void drive(Vector vector, double rot) {
-        SmartDashboard.putString("Input: ", vector.x + ", " + vector.y + ", " + rot);
+    // Translation2d is in mps, and rot is in radians per sec
+    public void drive(Translation2d vector, double rot) {
+        SmartDashboard.putString("Input: ", vector.getX() + ", " + vector.getY() + ", " + rot);
 
-
-        vector.rotate(gyro.getAngle());
+        vector.rotateBy(gyro.getAngle());
  
-        SmartDashboard.putString("Input Post Rotate : ", vector.x + ", " + vector.y + ", " + rot);
+        SmartDashboard.putString("Input Post Rotate : ", vector.getX() + ", " + vector.getY() + ", " + rot);
 
         SwerveModuleState[] states = kSwerve.SWERVE_KINEMATICS.getStates(vector, rot);
 
         // TODO: FIX SHITY CODE https://github.com/frc1678/C2023-Public/blob/main/src/main/java/com/team1678/lib/swerve/SwerveDriveKinematics.java
         for (SwerveModuleState i : states) {
-            if (i.velocity > kSwerve.MAX_SPEED) {
-                i.velocity = kSwerve.MAX_SPEED;
+            if (i.speedMetersPerSecond > kSwerve.MAX_SPEED) {
+                i.speedMetersPerSecond = kSwerve.MAX_SPEED;
             }
         }
 
         for (SwerveModule i : swerveMods) {
-            SmartDashboard.putString("Swerve Module State " + i.moduleNumber, states[i.moduleNumber].velocity + ", " + states[i.moduleNumber].angle.getDegrees());
+            SmartDashboard.putString("Swerve Module State " + i.moduleNumber, states[i.moduleNumber].speedMetersPerSecond + ", " + states[i.moduleNumber].angle.getDegrees());
             i.setDesiredState(states[i.moduleNumber]);
         }
     }
@@ -115,7 +108,7 @@ public class Swerve extends SubsystemBase {
 
         SmartDashboard.putNumber("Angle", MathUtil.inputModulus(gyro.getAngle().getDegrees(), 0, 360));
 
-        field.setRobotPose(odom.getPose().getPose2d());
+        field.setRobotPose(odom.getPose());
 
         for (SwerveModule i : swerveMods) {
             SmartDashboard.putNumber("Swerve Module Angle " + i.moduleNumber, i.getAngle());

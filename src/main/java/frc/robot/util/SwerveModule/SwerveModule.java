@@ -1,8 +1,8 @@
 package frc.robot.util.SwerveModule;
 
 import SushiFrcLib.Swerve.SwerveModuleConstants;
-import frc.robot.util.SwerveModulePosition;
-import frc.robot.util.SwerveModuleState;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 
 public abstract class SwerveModule {
     public int moduleNumber;

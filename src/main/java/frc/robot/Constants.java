@@ -4,10 +4,10 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.revrobotics.CANSparkMax.IdleMode;
 
 import SushiFrcLib.Swerve.SwerveModuleConstants;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.util.SwerveKinematics;
-import frc.robot.util.Vector;
 
 public final class Constants {
     public static enum RobotName {
@@ -58,10 +58,11 @@ public final class Constants {
         public static final double ANGLE_RPM_TO_RADIANS_PER_SECOND = DRIVE_ROTATIONS_TO_METERS / 60.0;
 
         public static final SwerveKinematics SWERVE_KINEMATICS = new SwerveKinematics(
-                new Vector(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
-                new Vector(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
-                new Vector(WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0),
-                new Vector(-WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0));
+                new Translation2d(WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
+                new Translation2d(-WHEEL_BASE / 2.0, TRACK_WIDTH / 2.0),
+                new Translation2d(WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0),
+                new Translation2d(-WHEEL_BASE / 2.0, -TRACK_WIDTH / 2.0)
+        );
 
         /* Swerve Current Limiting */
         public static final int ANGLE_CURRENT_LIMIT = 20;

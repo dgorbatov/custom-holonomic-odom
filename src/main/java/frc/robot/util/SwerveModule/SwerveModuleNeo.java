@@ -14,12 +14,12 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import SushiFrcLib.Swerve.SwerveModuleConstants;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Constants.kSwerve;
-import frc.robot.util.SwerveModulePosition;
-import frc.robot.util.SwerveModuleState;
 
 public class SwerveModuleNeo extends SwerveModule {
     private final CANSparkMax driveMotor;
@@ -68,9 +68,9 @@ public class SwerveModuleNeo extends SwerveModule {
         //     targetAngle = delta > 90 ? (targetAngle -= 180) : (targetAngle += 180);        
         // }
 
-        drivePID.setReference(state.velocity, CANSparkMax.ControlType.kVelocity);
+        drivePID.setReference(state.speedMetersPerSecond, CANSparkMax.ControlType.kVelocity);
 
-        double angle = Math.abs(state.velocity) <= Constants.kSwerve.MAX_SPEED * 0.01
+        double angle = Math.abs(state.speedMetersPerSecond) <= Constants.kSwerve.MAX_SPEED * 0.01
             ? lastAngle
             :  targetAngle;
 

@@ -12,10 +12,10 @@ import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 import com.ctre.phoenix.sensors.WPI_CANCoder;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants.kPorts;
 import frc.robot.Constants.kSwerve;
-import frc.robot.util.SwerveModulePosition;
-import frc.robot.util.SwerveModuleState;
 
 /**
  * Falcon Swerve Module.
@@ -71,7 +71,7 @@ public class SwerveModuleFalcon extends SwerveModule {
             lastAngle, desiredState.angle.getDegrees()
         );
 
-        double targetSpeed = desiredState.velocity;
+        double targetSpeed = desiredState.speedMetersPerSecond;
 
         double delta = targetAngle - lastAngle;
 

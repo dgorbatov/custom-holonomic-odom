@@ -4,43 +4,46 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Robot;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 
 public class SwerveOdom {
-    private RobotPose currPos;
+    private Pose2d currPos;
     private SwerveKinematics kinematics;
-    private double oldTime;
 
     private SwerveModulePosition[] prevSwerveModulePositions;
 
     public SwerveOdom(SwerveKinematics kinematics) {
         this.kinematics = kinematics;
 
-        currPos = new RobotPose(new Vector(0, 0), new Rotation2d(0));
+        currPos = new Pose2d(new Translation2d(0, 0), new Rotation2d(0));
 
         prevSwerveModulePositions = new SwerveModulePosition[]{null, null, null, null};
 
         for (int i=0; i < 4; ++i) {
             prevSwerveModulePositions[i] = new SwerveModulePosition(0, Rotation2d.fromDegrees(0));
         }
-
-        oldTime = Timer.getFPGATimestamp();
     }
 
-    public void setPose(RobotPose newPos) {
+    public void setPose(Pose2d newPos) {
         currPos = newPos;
     }
 
     public void updatePoseWithGyro(SwerveModulePosition[] swerveModulePositions, Rotation2d gyroAngle) {
         Twist2d twist = kinematics.getTwistFromDeltra(getSwerveModuleDelta(swerveModulePositions));
 
-        twist.dtheta = gyroAngle.minus(currPos.rot).getRadians();
+        twist.dtheta = gyroAngle.minus(currPos.getRotation()).getRadians();
 
-        Pose2d pose = (new Pose2d(new Translation2d(currPos.loc.x, currPos.loc.y), currPos.rot)).exp(twist);
+        Pose2d pose = (
+            new Pose2d(
+                new Translation2d(
+                    currPos.getTranslation().getX(), 
+                    currPos.getTranslation().getY()
+                ), 
+                currPos.getRotation()
+            )
+        ).exp(twist);
 
-        currPos = new RobotPose(new Vector(pose.getX(), pose.getY()), gyroAngle);
+        currPos = new Pose2d(new Translation2d(pose.getX(), pose.getY()), gyroAngle);
     }
 
     private SwerveModulePosition[] getSwerveModuleDelta(SwerveModulePosition[] swerveModulePositions) {
@@ -48,18 +51,17 @@ public class SwerveOdom {
 
         for (int i=0; i < 4; ++i) {
             states[i] = new SwerveModulePosition(
-                (swerveModulePositions[i].distance - prevSwerveModulePositions[i].distance), 
+                (swerveModulePositions[i].distanceMeters - prevSwerveModulePositions[i].distanceMeters), 
                 swerveModulePositions[i].angle
             );
         }
 
         prevSwerveModulePositions = swerveModulePositions;
-        oldTime = Timer.getFPGATimestamp();
 
         return states;
     }
 
-    public RobotPose getPose() {
+    public Pose2d getPose() {
         return currPos;
     }
 }
